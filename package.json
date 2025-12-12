@@ -1,0 +1,13 @@
+{
+  "name": "pierre-feuille-ciseaux",
+  "version": "1.0.0",
+  "description": "Mini jeu Pierre-Feuille-Ciseaux en console",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": ["jeu", "console", "pierre-feuille-ciseaux"],
+  "author": "",
+  "license": "ISC"
+}
+
