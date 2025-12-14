@@ -7,6 +7,7 @@ const rl = readline.createInterface({
 });
 
 const SCORE_FILE = 'score.json';
+const OPTIONS = ['pierre', 'feuille', 'ciseaux'];
 
 // Variables pour le score cumulatif
 let victoires = 0;
@@ -24,7 +25,7 @@ function chargerScores() {
       egalites = scores.egalites || 0;
       console.log(`Scores précédents chargés : Victoires: ${victoires} | Défaites: ${defaites} | Égalités: ${egalites}\n`);
     }
-  } catch (error) {
+  } catch {
     console.log('Impossible de charger les scores précédents. Démarrage avec des scores à zéro.\n');
   }
 }
@@ -33,41 +34,53 @@ function chargerScores() {
 function sauvegarderScores() {
   try {
     const scores = {
-      victoires: victoires,
-      defaites: defaites,
-      egalites: egalites
+      victoires,
+      defaites,
+      egalites
     };
     fs.writeFileSync(SCORE_FILE, JSON.stringify(scores, null, 2), 'utf8');
     console.log('Scores sauvegardés avec succès !');
-  } catch (error) {
+  } catch {
     console.log('Erreur lors de la sauvegarde des scores.');
   }
 }
 
-console.log("Bienvenue dans Pierre-Feuille-Ciseaux !");
+console.log('Bienvenue dans Pierre-Feuille-Ciseaux !');
 chargerScores();
 
+// Fonction pour déterminer le gagnant
+function determinerGagnant(choixJoueur, choixOrdinateur) {
+  if (choixJoueur === choixOrdinateur) {
+    return 'egalite';
+  }
+  if (
+    (choixJoueur === 'pierre' && choixOrdinateur === 'ciseaux') ||
+    (choixJoueur === 'feuille' && choixOrdinateur === 'pierre') ||
+    (choixJoueur === 'ciseaux' && choixOrdinateur === 'feuille')
+  ) {
+    return 'victoire';
+  }
+  return 'defaite';
+}
+
 function jouerRound() {
-  rl.question("Choisissez votre coup (pierre, feuille ou ciseaux) : ", (choix) => {
+  rl.question('Choisissez votre coup (pierre, feuille ou ciseaux) : ', (choix) => {
     const choixMinuscule = choix.toLowerCase().trim();
     
-    if (choixMinuscule === 'pierre' || choixMinuscule === 'feuille' || choixMinuscule === 'ciseaux') {
+    if (OPTIONS.includes(choixMinuscule)) {
       console.log(`Vous avez choisi : ${choixMinuscule}`);
       
       // Choix aléatoire de l'ordinateur
-      const options = ['pierre', 'feuille', 'ciseaux'];
-      const choixOrdinateur = options[Math.floor(Math.random() * options.length)];
+      const choixOrdinateur = OPTIONS[Math.floor(Math.random() * OPTIONS.length)];
       console.log(`L'ordinateur a choisi : ${choixOrdinateur}`);
       
       // Déterminer le gagnant
-      if (choixMinuscule === choixOrdinateur) {
+      const resultat = determinerGagnant(choixMinuscule, choixOrdinateur);
+      
+      if (resultat === 'egalite') {
         console.log('Égalité !');
         egalites++;
-      } else if (
-        (choixMinuscule === 'pierre' && choixOrdinateur === 'ciseaux') ||
-        (choixMinuscule === 'feuille' && choixOrdinateur === 'pierre') ||
-        (choixMinuscule === 'ciseaux' && choixOrdinateur === 'feuille')
-      ) {
+      } else if (resultat === 'victoire') {
         console.log('Vous gagnez !');
         victoires++;
       } else {
@@ -79,7 +92,7 @@ function jouerRound() {
       console.log(`\nScore : Victoires: ${victoires} | Défaites: ${defaites} | Égalités: ${egalites}`);
       
       // Demander si le joueur veut rejouer
-      rl.question("\nVoulez-vous rejouer ? (y/n) : ", (reponse) => {
+      rl.question('\nVoulez-vous rejouer ? (y/n) : ', (reponse) => {
         const reponseMinuscule = reponse.toLowerCase().trim();
         
         if (reponseMinuscule === 'y') {
@@ -96,7 +109,7 @@ function jouerRound() {
         }
       });
     } else {
-      console.log(`Choix invalide : ${choix}. Veuillez choisir entre 'pierre', 'feuille' ou 'ciseaux'.`);
+      console.log(`Choix invalide : ${choix}. Veuillez choisir entre ${OPTIONS.join(', ')}.`);
       jouerRound();
     }
   });
